@@ -1,0 +1,3 @@
+[submodule "Carthage/Checkouts/SwiftyStoreKit"]
+	path = Carthage/Checkouts/SwiftyStoreKit
+	url = https://github.com/bizz84/SwiftyStoreKit.git
