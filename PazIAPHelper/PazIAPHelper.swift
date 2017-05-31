@@ -38,7 +38,7 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
         }
     }
     
-    static let shared: PazIAPHelper = {
+    public static let shared: PazIAPHelper = {
         let shared = PazIAPHelper()
         shared.restoreProductsFromMemery()
         #if !os(OSX) && !os(Linux)
