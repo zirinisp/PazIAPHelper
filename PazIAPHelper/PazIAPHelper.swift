@@ -10,7 +10,6 @@ import Foundation
 import StoreKit
 import SwiftyStoreKit
 
-
 @available(iOS 8.0, *)
 open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsRequestDelegate {
     
@@ -95,7 +94,7 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
     
     open func getProduct(withID productID: String) -> PazIAPProduct? {
         for product in self.products {
-            if product.productID == productID {
+            if product.productIdentifier == productID {
                 return product
             }
         }
@@ -137,7 +136,7 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
         
         var productIDs = [String]()
         for product in products {
-            productIDs.append(product.productID)
+                productIDs.append(product.productIdentifier)
         }
         let productsRequest = SKProductsRequest(productIdentifiers: Set(productIDs))
         productsRequest.delegate = self
@@ -216,6 +215,21 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
         }
         NotificationCenter.default.post(name: PazIAPHelper.UpdateNotification.ProductsRequestCompleted.name, object: self)
     }
+
+    // MARK: AppStoreReceipt
+    open var appStoreReceiptData: Data? {
+        guard let receiptUrl = Bundle.main.appStoreReceiptURL else {
+            return nil
+        }
+        do {
+            let receipt: Data = try Data(contentsOf:receiptUrl)
+            return receipt
+        } catch {
+            print("Could not get receipt data")
+            return nil
+        }
+    }
+
 }
 
 enum AppConfiguration: Int {
@@ -249,7 +263,7 @@ struct AppConfig {
 }
 
 public func == (lhs: PazIAPProduct, rhs: PazIAPProduct) -> Bool {
-    return lhs.productID == rhs.productID
+    return lhs.productIdentifier == rhs.productIdentifier
 }
 
 internal extension Date {

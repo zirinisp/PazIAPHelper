@@ -56,12 +56,12 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         }
     }
     
-    open var title: String
+    open var title: String?
     
-    open var subtitle: String
+    open var subtitle: String?
     
     /// Product ID registered with apple servers
-    open var productID: String
+    open var productIdentifier: String
     
     open var productType: ProductType
     
@@ -96,6 +96,15 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
             }
         }
     }
+    
+    /// Compare
+    open override func isEqual(_ object: Any?) -> Bool {
+        guard let product = object as? PazIAPProduct else {
+            return false
+        }
+        return self.productIdentifier == product.productIdentifier
+    }
+    
     /// When was the product last fetched
     open var lastFetch: Date?
     
@@ -103,13 +112,13 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     open var userInfo = [String: AnyObject]()
     
     /// Used to store purchases on keychain. If changed all previous purchases will become inactive.
-    open var keychainPassword = "fdjUHUK348@$%fgkgf"
+    open var keychainPassword: String? = "fdjUHUK348@$%fgkgf"
     
     /// Message to display once purchase is successfull.
-    open var purchaseMessage: String
+    open var purchaseMessage: String?
     
     /// Message to display when user is asked to make a purchase.
-    open var purchasePromptMessage: String
+    open var purchasePromptMessage: String?
     
     /// Set to bypass active
     open var bypassActive: Bool = false
@@ -175,10 +184,10 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     open var level = 0
     
     /// Init
-    public init(title: String, subtitle: String, productID: String, productType: ProductType, expiryDate: Date?, autoRenewCheck: Bool, purchasePromptMessage: String, purchaseMessage: String, level: Int) {
+    public init(title: String?, subtitle: String?, productIdentifier: String, productType: ProductType, expiryDate: Date?, autoRenewCheck: Bool, purchasePromptMessage: String?, purchaseMessage: String?, level: Int) {
         self.title = title
         self.subtitle = subtitle
-        self.productID = productID
+        self.productIdentifier = productIdentifier
         self.productType = productType
         self.purchasePromptMessage = purchasePromptMessage
         self.purchaseMessage = purchaseMessage
@@ -194,8 +203,8 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         SKPaymentQueue.default().remove(self)
     }
     
-    public convenience init(title: String, subtitle: String, productID: String, productType: ProductType, expiryDate: Date?, autoRenewCheck: Bool, purchasePromptMessage: String, purchaseMessage: String) {
-        self.init(title: title, subtitle: subtitle, productID: productID, productType: productType, expiryDate: expiryDate, autoRenewCheck: autoRenewCheck, purchasePromptMessage: purchasePromptMessage, purchaseMessage: purchaseMessage, level: 0)
+    public convenience init(title: String, subtitle: String, productIdentifier: String, productType: ProductType, expiryDate: Date?, autoRenewCheck: Bool, purchasePromptMessage: String?, purchaseMessage: String?) {
+        self.init(title: title, subtitle: subtitle, productIdentifier: productIdentifier, productType: productType, expiryDate: expiryDate, autoRenewCheck: autoRenewCheck, purchasePromptMessage: purchasePromptMessage, purchaseMessage: purchaseMessage, level: 0)
     }
     
     open func fetchProduct() {
@@ -203,7 +212,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
             return
         }
         self.fetchingProduct = true
-        let productsRequest = SKProductsRequest(productIdentifiers: Set([self.productID]))
+        let productsRequest = SKProductsRequest(productIdentifiers: Set([self.productIdentifier]))
         productsRequest.delegate = self
         productsRequest.start()
     }
@@ -229,10 +238,13 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     
     /// Activates product. Should be used only when valid purchase is made.
     func activateProduct() {
-        let passwordData = self.keychainPassword.data(using: String.Encoding.utf8)
+        guard let passwordData = self.keychainPassword?.data(using: String.Encoding.utf8) else {
+            print("Error not password data")
+            return
+        }
         
         var keychainQuery = self.keychainDictionary()
-        keychainQuery[kSecValueData as String] = passwordData! as AnyObject?
+        keychainQuery[kSecValueData as String] = passwordData as AnyObject?
         
         // Delete any existing items
         SecItemDelete(keychainQuery as CFDictionary)
@@ -272,7 +284,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     func keychainDictionary() -> [String: AnyObject] {
         let keychainDictionary: [String: AnyObject] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: self.productID as AnyObject,
+            kSecAttrService as String: self.productIdentifier as AnyObject,
             kSecAttrAccount as String: Bundle.main.bundleIdentifier! as AnyObject
         ]
         return keychainDictionary
@@ -280,10 +292,13 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     
     /// Should be used only when we want to delete the purchase from memory
     func resetPurchase() {
-        let passwordData = self.keychainPassword.data(using: String.Encoding.utf8)
+        guard let passwordData = self.keychainPassword?.data(using: String.Encoding.utf8) else {
+            print("could not reset no password found")
+            return
+        }
         
         var keychainQuery = self.keychainDictionary()
-        keychainQuery[kSecValueData as String] = passwordData! as AnyObject?
+        keychainQuery[kSecValueData as String] = passwordData as AnyObject?
         
         // Delete any existing items
         SecItemDelete(keychainQuery as CFDictionary)
@@ -294,7 +309,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     open func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         self.fetchingProduct = false
         for product in response.products {
-            if product.productIdentifier == self.productID {
+            if product.productIdentifier == self.productIdentifier {
                 self._product = product
                 self.lastFetch = Date()
                 NotificationCenter.default.post(name: PazIAPProduct.UpdateNotification.ProductRequest(success: true).name, object: self)
@@ -307,11 +322,11 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     // MARK: SKPaymentTransactionObserver
     open func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
-            if transaction.payment.productIdentifier == self.productID {
+            if transaction.payment.productIdentifier == self.productIdentifier {
                 switch transaction.transactionState {
                 case .failed:
                     self.purchasingProduct = false
-                    print("Purchase failed \(self.productID)")
+                    print("Purchase failed \(self.productIdentifier)")
                     NotificationCenter.default.post(name: PazIAPProduct.UpdateNotification.ProductPurchase(success: false).name, object: self, userInfo: [PazIAPProduct.UpdateNotification.ProductPurchaseTransactionKey : transaction])
                     SKPaymentQueue.default().finishTransaction(transaction)
                 case .purchased, .restored:
@@ -328,7 +343,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     open func verifyAndActivate(_ transaction: SKPaymentTransaction? = nil) {
         func activate() {
             self.activateProduct()
-            print("Purchase successful \(self.productID)")
+            print("Purchase successful \(self.productIdentifier)")
             if let transaction = transaction {
                 NotificationCenter.default.post(name: PazIAPProduct.UpdateNotification.ProductPurchase(success: true).name, object: self, userInfo: [PazIAPProduct.UpdateNotification.ProductPurchaseTransactionKey : transaction])
                 SKPaymentQueue.default().finishTransaction(transaction)
@@ -350,14 +365,17 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
             return
         }
         let appleValidator = AppleReceiptValidator(service: .production)
-        SwiftyStoreKit.verifyReceipt(using: appleValidator, password: sharedSecret) { result in
+        SwiftyStoreKit.verifyReceipt(using: appleValidator, password: sharedSecret) { [weak self] result in
+            guard let strongSelf = self else {
+                return
+            }
             switch result {
             case .success(let receipt):
-                switch self.productType {
+                switch strongSelf.productType {
                 case .oneOff:
                     // Verify the purchase of Consumable or NonConsumable
                     let purchaseResult = SwiftyStoreKit.verifyPurchase(
-                        productId: self.productID,
+                        productId: strongSelf.productIdentifier,
                         inReceipt: receipt)
                     
                     switch purchaseResult {
@@ -365,7 +383,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
                         print("Product is purchased: \(receiptItem)")
                         activate()
                     case .notPurchased:
-                        print("The user has never purchased \(self.productID)")
+                        print("The user has never purchased \(strongSelf.productIdentifier)")
                         let error = PurchaseError.notVerified
                         fail(error: error, finishTransaction: true)
                     }
@@ -373,17 +391,17 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
                     // Verify the purchase of a Subscription
                     let purchaseResult = SwiftyStoreKit.verifySubscription(
                         type: .autoRenewable, // or .nonRenewing (see below)
-                        productId: self.productID,
+                        productId: strongSelf.productIdentifier,
                         inReceipt: receipt)
                     
                     switch purchaseResult {
                     case .purchased(let expiryDate, _):
                         print("Product is valid until \(expiryDate)")
-                        self.expiryDate = expiryDate
+                        strongSelf.expiryDate = expiryDate
                         activate()
                     case .expired(let expiryDate, _):
                         print("Product is expired since \(expiryDate)")
-                        self.expiryDate = expiryDate
+                        strongSelf.expiryDate = expiryDate
                         let error = PurchaseError.expired(date: expiryDate)
                         fail(error: error, finishTransaction: true)
                     case .notPurchased:
@@ -405,7 +423,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     open func encode(with aCoder: NSCoder) {
         aCoder.encode(self.title, forKey:"name")
         aCoder.encode(self.subtitle, forKey:"subtitle")
-        aCoder.encode(self.productID, forKey:"productID")
+        aCoder.encode(self.productIdentifier, forKey:"productID")
         aCoder.encode(self.purchaseMessage, forKey: "puchaseMessage")
         aCoder.encode(self.purchasePromptMessage, forKey:  "purchasePromptMessage")
         aCoder.encode((self.level as Int?), forKey: "level")
@@ -420,15 +438,18 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         guard let level = aDecoder.decodeObject(forKey: "level") as? Int else {
             return nil
         }
-        let title = (aDecoder.decodeObject(forKey: "name") as? String) ?? ""
-        let subtitle = (aDecoder.decodeObject(forKey: "subtitle") as? String) ?? ""
-        let productID = (aDecoder.decodeObject(forKey: "productID") as? String) ?? ""
-        let purchaseMessage = (aDecoder.decodeObject(forKey: "purchaseMessage") as? String) ?? ""
-        let purchasePromptMessage = (aDecoder.decodeObject(forKey: "purchasePromptMessage") as? String) ?? ""
+        guard let productIdentifier = (aDecoder.decodeObject(forKey: "productID") as? String) else {
+            return nil
+        }
+
+        let title = (aDecoder.decodeObject(forKey: "name") as? String)
+        let subtitle = (aDecoder.decodeObject(forKey: "subtitle") as? String)
+        let purchaseMessage = (aDecoder.decodeObject(forKey: "purchaseMessage") as? String)
+        let purchasePromptMessage = (aDecoder.decodeObject(forKey: "purchasePromptMessage") as? String)
         let productType = ProductType(rawValue: (aDecoder.decodeObject(forKey: "productType") as? Int) ?? 0) ?? ProductType.oneOff
         let expiryDate = aDecoder.decodeObject(forKey: "expiryDate") as? Date
         let autoRenewCheck = (aDecoder.decodeObject(forKey: "autoRenewCheck") as? Bool) ?? true
-        self.init(title: title, subtitle: subtitle, productID: productID, productType: productType, expiryDate: expiryDate, autoRenewCheck: autoRenewCheck, purchasePromptMessage: purchasePromptMessage, purchaseMessage: purchaseMessage, level: level)
+        self.init(title: title, subtitle: subtitle, productIdentifier: productIdentifier, productType: productType, expiryDate: expiryDate, autoRenewCheck: autoRenewCheck, purchasePromptMessage: purchasePromptMessage, purchaseMessage: purchaseMessage, level: level)
         if let userInfo = aDecoder.decodeObject(forKey: "userInfo") as? [String: AnyObject] {
             self.userInfo = userInfo
         }
