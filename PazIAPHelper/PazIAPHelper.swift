@@ -37,7 +37,12 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
         }
     }
     
-    private static var _shared: PazIAPHelper = {
+    private static var _shared: PazIAPHelper?
+    
+    open class var shared: PazIAPHelper {
+        if let shared = self._shared {
+            return shared
+        }
         let shared = PazIAPHelper()
         shared.restoreProductsFromMemery()
         #if !os(OSX) && !os(Linux)
@@ -45,12 +50,9 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
                 shared.saveProductsToMemory()
             })
         #endif
+        self._shared = shared
         return shared
-    }()
-    
-    open class var shared: PazIAPHelper {
         // this way we can easily subclass and change the shared.
-        return PazIAPHelper._shared
     }
     
     public override init() {
@@ -76,7 +78,6 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
         }
     }
     
-    public var sharedSecret: String?
     public var environment: AppleReceiptValidator.VerifyReceiptURLType = (AppConfig.appConfiguration.rawValue == AppConfiguration.AppStore.rawValue) ? .production : .sandbox
     
     public func canMakePayments() -> Bool {

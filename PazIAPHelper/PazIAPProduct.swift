@@ -56,6 +56,8 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         }
     }
     
+    public static var sharedSecret: String?
+    
     open var title: String?
     
     open var subtitle: String?
@@ -360,7 +362,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
             }
         }
         // Check is shared secret is available. If not skip the verification
-        guard let sharedSecret = PazIAPHelper.shared.sharedSecret else {
+        guard let sharedSecret = type(of: self).sharedSecret else {
             activate()
             return
         }
