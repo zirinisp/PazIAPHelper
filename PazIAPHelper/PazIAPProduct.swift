@@ -155,6 +155,9 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
             }
             switch self.productType {
             case .oneOff:
+                if let expiryDate = self.expiryDate, !expiryDate.isLaterThan(Date()) {
+                    return false
+                }
                 return self._active
             case .autoRenewable:
                 guard let expiryDate = self.expiryDate else {
