@@ -137,7 +137,7 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
         
         var productIDs = [String]()
         for product in products {
-                productIDs.append(product.productIdentifier)
+            productIDs.append(product.productIdentifier)
         }
         let productsRequest = SKProductsRequest(productIdentifiers: Set(productIDs))
         productsRequest.delegate = self
@@ -216,7 +216,7 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
         }
         NotificationCenter.default.post(name: PazIAPHelper.UpdateNotification.ProductsRequestCompleted.name, object: self)
     }
-
+    
     // MARK: AppStoreReceipt
     open var appStoreReceiptData: Data? {
         guard let receiptUrl = Bundle.main.appStoreReceiptURL else {
@@ -230,7 +230,7 @@ open class PazIAPHelper: NSObject, SKPaymentTransactionObserver, SKProductsReque
             return nil
         }
     }
-
+    
 }
 
 enum AppConfiguration: Int {
@@ -271,7 +271,7 @@ internal extension Date {
     func isLaterThan(_ date: Date) -> Bool {
         return !self.isEarlierThan(date)
     }
-
+    
     func isEarlierThan(_ date: Date) -> Bool {
         return !(self.compare(date as Date) == ComparisonResult.orderedDescending)
     }

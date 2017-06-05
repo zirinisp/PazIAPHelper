@@ -21,6 +21,8 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         /// This is the key to access more information on a successfull or failed notification
         public static var ProductPurchaseTransactionKey = "PazIAPProduct.UpdateNotificationProductPurchaseTransactionKey"
         
+        public static var ProductPurchaseRenewKey = "PazIAPProduct.UpdateNotificationProductPurchaseRenewKey"
+        
         public static var ProductPurchaseErrorKey = "PazIAPProduct.UpdateNotificationProductPurchaseErrorKey"
         
         public var name: Notification.Name {
@@ -67,21 +69,6 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     
     open var productType: ProductType
     
-    open var expiryDate: Date? {
-        didSet {
-            guard let oldDate = oldValue, let newDate = self.expiryDate else {
-                self.autoRenewCheck = false
-                return
-            }
-            if newDate.isLaterThan(oldDate) {
-                self.autoRenewCheck = false
-            }
-        }
-    }
-
-    // This is used to run auto renew check only once
-    var autoRenewCheck: Bool
-    
     private var _product: SKProduct?
     /// Set to automatically fetch product when product variable is nil and it is accessed
     open var autoFetch = true
@@ -105,6 +92,10 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
             return false
         }
         return self.productIdentifier == product.productIdentifier
+    }
+    
+    open override var hashValue: Int {
+        return self.productIdentifier.hashValue
     }
     
     /// When was the product last fetched
@@ -166,7 +157,15 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
             case .oneOff:
                 return self._active
             case .autoRenewable:
-                guard let expiryDate = self.expiryDate, expiryDate.isLaterThan(Date()) else {
+                guard let expiryDate = self.expiryDate else {
+                    // Auto Renewables should have an expiry date
+                    if self.autoRenewCheck {
+                        self.verifyAndActivate()
+                        self.autoRenewCheck = false
+                    }
+                    return false
+                }
+                guard expiryDate.isLaterThan(Date()) else {
                     if self.autoRenewCheck {
                         self.verifyAndActivate()
                         self.autoRenewCheck = false
@@ -186,7 +185,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     open var level = 0
     
     /// Init
-    public init(title: String?, subtitle: String?, productIdentifier: String, productType: ProductType, expiryDate: Date?, autoRenewCheck: Bool, purchasePromptMessage: String?, purchaseMessage: String?, level: Int) {
+    public init(title: String?, subtitle: String?, productIdentifier: String, productType: ProductType, autoRenewCheck: Bool, purchasePromptMessage: String?, purchaseMessage: String?, level: Int) {
         self.title = title
         self.subtitle = subtitle
         self.productIdentifier = productIdentifier
@@ -194,10 +193,10 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         self.purchasePromptMessage = purchasePromptMessage
         self.purchaseMessage = purchaseMessage
         self.level = level
-        self.expiryDate = expiryDate
         self.autoRenewCheck = autoRenewCheck
         super.init()
         self.updateActive()
+        self.updateExpiryDateFromKeychain()
         SKPaymentQueue.default().add(self)
     }
     
@@ -205,8 +204,8 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         SKPaymentQueue.default().remove(self)
     }
     
-    public convenience init(title: String, subtitle: String, productIdentifier: String, productType: ProductType, expiryDate: Date?, autoRenewCheck: Bool, purchasePromptMessage: String?, purchaseMessage: String?) {
-        self.init(title: title, subtitle: subtitle, productIdentifier: productIdentifier, productType: productType, expiryDate: expiryDate, autoRenewCheck: autoRenewCheck, purchasePromptMessage: purchasePromptMessage, purchaseMessage: purchaseMessage, level: 0)
+    public convenience init(title: String, subtitle: String, productIdentifier: String, productType: ProductType, autoRenewCheck: Bool, purchasePromptMessage: String?, purchaseMessage: String?) {
+        self.init(title: title, subtitle: subtitle, productIdentifier: productIdentifier, productType: productType, autoRenewCheck: autoRenewCheck, purchasePromptMessage: purchasePromptMessage, purchaseMessage: purchaseMessage, level: 0)
     }
     
     open func fetchProduct() {
@@ -241,7 +240,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     /// Activates product. Should be used only when valid purchase is made.
     func activateProduct() {
         guard let passwordData = self.keychainPassword?.data(using: String.Encoding.utf8) else {
-            print("Error not password data")
+            print("Error no password data")
             return
         }
         
@@ -287,6 +286,77 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         let keychainDictionary: [String: AnyObject] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: self.productIdentifier as AnyObject,
+            kSecAttrAccount as String: Bundle.main.bundleIdentifier! as AnyObject
+        ]
+        return keychainDictionary
+    }
+    
+    // MARK: Expiry Date Data on Keychain
+    static var expiryDateFormatter: DateFormatter = {
+        var expiryDateFormatter = DateFormatter()
+        expiryDateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        expiryDateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        expiryDateFormatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'"
+        return expiryDateFormatter
+    }()
+    
+    private var _expiryDate: Date?
+    open var expiryDate: Date? {
+        get {
+            return self._expiryDate
+        }
+    }
+    
+    // This is used to run auto renew check only once
+    var autoRenewCheck: Bool
+    
+    /// Activates product. Should be used only when valid purchase is made.
+    public func setExpiryDate(date: Date) {
+        let dateString = PazIAPProduct.expiryDateFormatter.string(from: date)
+        guard let passwordData = dateString.data(using: String.Encoding.utf8) else {
+            print("Error no password data")
+            return
+        }
+        
+        var keychainQuery = self.keychainExpiryDictionary()
+        keychainQuery[kSecValueData as String] = passwordData as AnyObject?
+        
+        // Delete any existing items
+        SecItemDelete(keychainQuery as CFDictionary)
+        
+        // Add the new keychain item
+        let _: OSStatus = SecItemAdd(keychainQuery as CFDictionary, nil)
+        
+        // Check that it worked ok
+        self.updateExpiryDateFromKeychain()
+    }
+    
+    /// Checks keychain wheather purchase has been made and updated product
+    open func updateExpiryDateFromKeychain() {
+        var keychainQuery = self.keychainExpiryDictionary()
+        keychainQuery[kSecReturnData as String] = kCFBooleanTrue
+        keychainQuery[kSecMatchLimit as String] = kSecMatchLimitOne
+        
+        var result :AnyObject?
+        
+        // Search
+        let status = withUnsafeMutablePointer(to: &result) {
+            SecItemCopyMatching(keychainQuery as CFDictionary, UnsafeMutablePointer($0))
+        }
+        if status == noErr, let data = result as? NSData, let dateString = String(data: data as Data, encoding: String.Encoding.utf8), let date = PazIAPProduct.expiryDateFormatter.date(from: dateString) {
+            if let oldDate = self._expiryDate, date.isLaterThan(oldDate) {
+                self.autoRenewCheck = true
+            }
+            self._expiryDate = date
+        } else {
+            self._expiryDate = nil
+        }
+    }
+    
+    func keychainExpiryDictionary() -> [String: AnyObject] {
+        let keychainDictionary: [String: AnyObject] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: self.productIdentifier+".expiryDate" as AnyObject,
             kSecAttrAccount as String: Bundle.main.bundleIdentifier! as AnyObject
         ]
         return keychainDictionary
@@ -344,10 +414,12 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
     // MARK: Verify Purchase
     open func verifyAndActivate(_ transaction: SKPaymentTransaction? = nil) {
         func activate() {
+            // We need a way to monitor if the transaction is a renew or not
+            let renew = self.expiryDate != nil && self.productType == .autoRenewable
             self.activateProduct()
             print("Purchase successful \(self.productIdentifier)")
             if let transaction = transaction {
-                NotificationCenter.default.post(name: PazIAPProduct.UpdateNotification.ProductPurchase(success: true).name, object: self, userInfo: [PazIAPProduct.UpdateNotification.ProductPurchaseTransactionKey : transaction])
+                NotificationCenter.default.post(name: PazIAPProduct.UpdateNotification.ProductPurchase(success: true).name, object: self, userInfo: [PazIAPProduct.UpdateNotification.ProductPurchaseTransactionKey : transaction, PazIAPProduct.UpdateNotification.ProductPurchaseRenewKey: renew])
                 SKPaymentQueue.default().finishTransaction(transaction)
             }
         }
@@ -399,11 +471,11 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
                     switch purchaseResult {
                     case .purchased(let expiryDate, _):
                         print("Product is valid until \(expiryDate)")
-                        strongSelf.expiryDate = expiryDate
+                        strongSelf.setExpiryDate(date: expiryDate)
                         activate()
                     case .expired(let expiryDate, _):
                         print("Product is expired since \(expiryDate)")
-                        strongSelf.expiryDate = expiryDate
+                        strongSelf.setExpiryDate(date: expiryDate)
                         let error = PurchaseError.expired(date: expiryDate)
                         fail(error: error, finishTransaction: true)
                     case .notPurchased:
@@ -432,7 +504,6 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         aCoder.encode(self.userInfo, forKey: "userInfo")
         aCoder.encode(self.keychainPassword, forKey: "keychainPassword")
         aCoder.encode(self.productType.rawValue, forKey: "productType")
-        aCoder.encode(self.expiryDate, forKey: "expiryDate")
         aCoder.encode(self.autoRenewCheck, forKey: "autoRenewCheck")
     }
     
@@ -443,21 +514,21 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
         guard let productIdentifier = (aDecoder.decodeObject(forKey: "productID") as? String) else {
             return nil
         }
-
+        
         let title = (aDecoder.decodeObject(forKey: "name") as? String)
         let subtitle = (aDecoder.decodeObject(forKey: "subtitle") as? String)
         let purchaseMessage = (aDecoder.decodeObject(forKey: "purchaseMessage") as? String)
         let purchasePromptMessage = (aDecoder.decodeObject(forKey: "purchasePromptMessage") as? String)
         let productType = ProductType(rawValue: (aDecoder.decodeObject(forKey: "productType") as? Int) ?? 0) ?? ProductType.oneOff
-        let expiryDate = aDecoder.decodeObject(forKey: "expiryDate") as? Date
         let autoRenewCheck = (aDecoder.decodeObject(forKey: "autoRenewCheck") as? Bool) ?? true
-        self.init(title: title, subtitle: subtitle, productIdentifier: productIdentifier, productType: productType, expiryDate: expiryDate, autoRenewCheck: autoRenewCheck, purchasePromptMessage: purchasePromptMessage, purchaseMessage: purchaseMessage, level: level)
+        self.init(title: title, subtitle: subtitle, productIdentifier: productIdentifier, productType: productType, autoRenewCheck: autoRenewCheck, purchasePromptMessage: purchasePromptMessage, purchaseMessage: purchaseMessage, level: level)
         if let userInfo = aDecoder.decodeObject(forKey: "userInfo") as? [String: AnyObject] {
             self.userInfo = userInfo
         }
         if let password = aDecoder.decodeObject(forKey: "keychainPassword") as? String {
             self.keychainPassword = password
         }
+        self.updateExpiryDateFromKeychain()
         self.updateActive()
     }
 }
