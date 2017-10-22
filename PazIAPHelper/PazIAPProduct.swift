@@ -441,8 +441,8 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
             activate()
             return
         }
-        let appleValidator = AppleReceiptValidator(service: .production)
-        SwiftyStoreKit.verifyReceipt(using: appleValidator, password: sharedSecret) { [weak self] result in
+        let appleValidator = AppleReceiptValidator(service: .production, sharedSecret: sharedSecret)
+        SwiftyStoreKit.verifyReceipt(using: appleValidator) { [weak self] result in
             guard let strongSelf = self else {
                 return
             }
