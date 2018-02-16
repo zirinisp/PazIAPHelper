@@ -15,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		649FB8272036D0B300E51BD2 /* PazIAPHelper.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PazIAPHelper.podspec; sourceTree = "<group>"; };
 		64DC0D451EDC1EB400FD5C5F /* PazIAPHelper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PazIAPHelper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64DC0D481EDC1EB400FD5C5F /* PazIAPHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PazIAPHelper.h; sourceTree = "<group>"; };
 		64DC0D491EDC1EB400FD5C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -40,6 +41,7 @@
 		64DC0D3B1EDC1EB400FD5C5F = {
 			isa = PBXGroup;
 			children = (
+				649FB8272036D0B300E51BD2 /* PazIAPHelper.podspec */,
 				64DC0D501EDC1FC000FD5C5F /* Cartfile */,
 				64DC0D471EDC1EB400FD5C5F /* PazIAPHelper */,
 				64DC0D461EDC1EB400FD5C5F /* Products */,
