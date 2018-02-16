@@ -467,7 +467,7 @@ open class PazIAPProduct: NSObject, NSCoding, SKProductsRequestDelegate, SKPayme
                 case .autoRenewable:
                     // Verify the purchase of a Subscription
                     let purchaseResult = SwiftyStoreKit.verifySubscription(
-                        type: .autoRenewable, // or .nonRenewing (see below)
+                        ofType: .autoRenewable, // or .nonRenewing (see below)
                         productId: strongSelf.productIdentifier,
                         inReceipt: receipt)
                     

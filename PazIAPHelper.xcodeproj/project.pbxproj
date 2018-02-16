@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		114D16CA048DED127A30920E /* Pods_PazIAPHelper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7774780B675176874AA22187 /* Pods_PazIAPHelper.framework */; };
+		649FB82A2036D60900E51BD2 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 649FB8292036D60900E51BD2 /* Podfile */; };
 		64DC0D4A1EDC1EB400FD5C5F /* PazIAPHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 64DC0D481EDC1EB400FD5C5F /* PazIAPHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		64DC0D531EDC210700FD5C5F /* SwiftyStoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64DC0D521EDC210700FD5C5F /* SwiftyStoreKit.framework */; };
 		64DC0D551EDC222200FD5C5F /* PazIAPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DC0D541EDC222200FD5C5F /* PazIAPHelper.swift */; };
@@ -16,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		649FB8272036D0B300E51BD2 /* PazIAPHelper.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PazIAPHelper.podspec; sourceTree = "<group>"; };
+		649FB8292036D60900E51BD2 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
 		64DC0D451EDC1EB400FD5C5F /* PazIAPHelper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PazIAPHelper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64DC0D481EDC1EB400FD5C5F /* PazIAPHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PazIAPHelper.h; sourceTree = "<group>"; };
 		64DC0D491EDC1EB400FD5C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -24,6 +27,9 @@
 		64DC0D541EDC222200FD5C5F /* PazIAPHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PazIAPHelper.swift; sourceTree = "<group>"; };
 		64DC0D561EDC24B400FD5C5F /* PazIAPHelper-Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PazIAPHelper-Storage.swift"; sourceTree = "<group>"; };
 		64DC0D581EDC24DF00FD5C5F /* PazIAPProduct.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PazIAPProduct.swift; sourceTree = "<group>"; };
+		7774780B675176874AA22187 /* Pods_PazIAPHelper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PazIAPHelper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A531F8DDAA39B75BAFA4DA01 /* Pods-PazIAPHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PazIAPHelper.release.xcconfig"; path = "Pods/Target Support Files/Pods-PazIAPHelper/Pods-PazIAPHelper.release.xcconfig"; sourceTree = "<group>"; };
+		DF86FDBB5DAFB905E6CEC35B /* Pods-PazIAPHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PazIAPHelper.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PazIAPHelper/Pods-PazIAPHelper.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +38,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64DC0D531EDC210700FD5C5F /* SwiftyStoreKit.framework in Frameworks */,
+				114D16CA048DED127A30920E /* Pods_PazIAPHelper.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,11 +48,13 @@
 		64DC0D3B1EDC1EB400FD5C5F = {
 			isa = PBXGroup;
 			children = (
+				649FB8292036D60900E51BD2 /* Podfile */,
 				649FB8272036D0B300E51BD2 /* PazIAPHelper.podspec */,
 				64DC0D501EDC1FC000FD5C5F /* Cartfile */,
 				64DC0D471EDC1EB400FD5C5F /* PazIAPHelper */,
 				64DC0D461EDC1EB400FD5C5F /* Products */,
 				64DC0D511EDC210600FD5C5F /* Frameworks */,
+				99ECD6DA984C4464408C1E82 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,8 +82,18 @@
 			isa = PBXGroup;
 			children = (
 				64DC0D521EDC210700FD5C5F /* SwiftyStoreKit.framework */,
+				7774780B675176874AA22187 /* Pods_PazIAPHelper.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		99ECD6DA984C4464408C1E82 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DF86FDBB5DAFB905E6CEC35B /* Pods-PazIAPHelper.debug.xcconfig */,
+				A531F8DDAA39B75BAFA4DA01 /* Pods-PazIAPHelper.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,10 +114,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 64DC0D4D1EDC1EB400FD5C5F /* Build configuration list for PBXNativeTarget "PazIAPHelper" */;
 			buildPhases = (
+				75596F9FEFC3E3D634DFF311 /* [CP] Check Pods Manifest.lock */,
 				64DC0D401EDC1EB400FD5C5F /* Sources */,
 				64DC0D411EDC1EB400FD5C5F /* Frameworks */,
 				64DC0D421EDC1EB400FD5C5F /* Headers */,
 				64DC0D431EDC1EB400FD5C5F /* Resources */,
+				9DA5A5338DC5A1F776BB9908 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -147,10 +168,47 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				649FB82A2036D60900E51BD2 /* Podfile in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		75596F9FEFC3E3D634DFF311 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PazIAPHelper-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9DA5A5338DC5A1F776BB9908 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PazIAPHelper/Pods-PazIAPHelper-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		64DC0D401EDC1EB400FD5C5F /* Sources */ = {
@@ -269,6 +327,7 @@
 		};
 		64DC0D4E1EDC1EB400FD5C5F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DF86FDBB5DAFB905E6CEC35B /* Pods-PazIAPHelper.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -294,6 +353,7 @@
 		};
 		64DC0D4F1EDC1EB400FD5C5F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A531F8DDAA39B75BAFA4DA01 /* Pods-PazIAPHelper.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
