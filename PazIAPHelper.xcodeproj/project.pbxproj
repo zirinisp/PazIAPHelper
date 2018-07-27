@@ -272,7 +272,6 @@
 		};
 		64DC0D4E1EDC1EB400FD5C5F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DF86FDBB5DAFB905E6CEC35B /* Pods-PazIAPHelper.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -298,7 +297,6 @@
 		};
 		64DC0D4F1EDC1EB400FD5C5F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A531F8DDAA39B75BAFA4DA01 /* Pods-PazIAPHelper.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
