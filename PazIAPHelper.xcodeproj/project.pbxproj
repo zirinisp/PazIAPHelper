@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		114D16CA048DED127A30920E /* Pods_PazIAPHelper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7774780B675176874AA22187 /* Pods_PazIAPHelper.framework */; };
-		649FB82A2036D60900E51BD2 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 649FB8292036D60900E51BD2 /* Podfile */; };
 		64DC0D4A1EDC1EB400FD5C5F /* PazIAPHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 64DC0D481EDC1EB400FD5C5F /* PazIAPHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		64DC0D531EDC210700FD5C5F /* SwiftyStoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64DC0D521EDC210700FD5C5F /* SwiftyStoreKit.framework */; };
 		64DC0D551EDC222200FD5C5F /* PazIAPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DC0D541EDC222200FD5C5F /* PazIAPHelper.swift */; };
@@ -18,7 +16,6 @@
 
 /* Begin PBXFileReference section */
 		649FB8272036D0B300E51BD2 /* PazIAPHelper.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PazIAPHelper.podspec; sourceTree = "<group>"; };
-		649FB8292036D60900E51BD2 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
 		64DC0D451EDC1EB400FD5C5F /* PazIAPHelper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PazIAPHelper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64DC0D481EDC1EB400FD5C5F /* PazIAPHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PazIAPHelper.h; sourceTree = "<group>"; };
 		64DC0D491EDC1EB400FD5C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -38,7 +35,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				64DC0D531EDC210700FD5C5F /* SwiftyStoreKit.framework in Frameworks */,
-				114D16CA048DED127A30920E /* Pods_PazIAPHelper.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -48,7 +44,6 @@
 		64DC0D3B1EDC1EB400FD5C5F = {
 			isa = PBXGroup;
 			children = (
-				649FB8292036D60900E51BD2 /* Podfile */,
 				649FB8272036D0B300E51BD2 /* PazIAPHelper.podspec */,
 				64DC0D501EDC1FC000FD5C5F /* Cartfile */,
 				64DC0D471EDC1EB400FD5C5F /* PazIAPHelper */,
@@ -114,12 +109,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 64DC0D4D1EDC1EB400FD5C5F /* Build configuration list for PBXNativeTarget "PazIAPHelper" */;
 			buildPhases = (
-				75596F9FEFC3E3D634DFF311 /* [CP] Check Pods Manifest.lock */,
 				64DC0D401EDC1EB400FD5C5F /* Sources */,
 				64DC0D411EDC1EB400FD5C5F /* Frameworks */,
 				64DC0D421EDC1EB400FD5C5F /* Headers */,
-				64DC0D431EDC1EB400FD5C5F /* Resources */,
-				9DA5A5338DC5A1F776BB9908 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -162,53 +154,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		64DC0D431EDC1EB400FD5C5F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				649FB82A2036D60900E51BD2 /* Podfile in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		75596F9FEFC3E3D634DFF311 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PazIAPHelper-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9DA5A5338DC5A1F776BB9908 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PazIAPHelper/Pods-PazIAPHelper-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		64DC0D401EDC1EB400FD5C5F /* Sources */ = {
